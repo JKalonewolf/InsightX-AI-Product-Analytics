@@ -1,0 +1,23 @@
+{
+  "name": "insightx-backend",
+  "version": "1.0.0",
+  "description": "Express.js REST API server and Telemetry event collector",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "cors": "^2.8.5",
+    "sqlite3": "^5.1.7",
+    "jsonwebtoken": "^9.0.2",
+    "axios": "^1.7.2",
+    "pg": "^8.11.5",
+    "mongoose": "^8.3.4",
+    "redis": "^4.6.13"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.2"
+  }
+}

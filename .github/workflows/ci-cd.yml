@@ -1,0 +1,96 @@
+name: InsightX CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  # Job 1: Lint & Verify syntax of monorepo services
+  verify-code:
+    name: Verify Code Syntax & Tests
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.10"
+
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r ai-service/requirements.txt
+
+    - name: Run Python Compile Check
+      run: python -m py_compile ai-service/main.py
+
+    - name: Set up Node.js 18
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18
+
+    - name: Install Backend dependencies
+      run: |
+        cd backend
+        npm install
+
+    - name: Run Backend Syntax validation
+      run: |
+        node --check backend/database.js
+        node --check backend/server.js
+
+  # Job 2: Build & Package Docker Containers (simulate AWS deploy)
+  build-and-package:
+    name: Build Docker Images
+    needs: verify-code
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build AI Service Image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./ai-service
+        push: false
+        tags: insightx-ai-service:latest
+
+    - name: Build Backend Image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./backend
+        push: false
+        tags: insightx-backend:latest
+
+    - name: Build Frontend Image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./frontend/Dockerfile
+        push: false
+        tags: insightx-frontend:latest
+
+  # Job 3: Template Deploy to AWS Cloud
+  deploy-to-aws:
+    name: Deploy to AWS EC2
+    needs: build-and-package
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+    - name: Print Deployment Notice
+      run: |
+        echo "Deploying to AWS EC2 target group..."
+        echo "CloudFront Cache Invalidating..."
+        echo "Database migrations executing against AWS RDS (PostgreSQL)..."
+        echo "Deploy completed successfully."

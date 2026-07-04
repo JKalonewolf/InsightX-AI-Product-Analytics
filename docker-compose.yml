@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+  # 1. Databases & Caching Layers
+  db-postgres:
+    image: postgres:15-alpine
+    container_name: ix-db-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: insightx_user
+      POSTGRES_PASSWORD: insightx_password
+      POSTGRES_DB: insightx_prod
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  db-mongo:
+    image: mongo:6.0-alpine
+    container_name: ix-db-mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodata:/data/db
+
+  db-redis:
+    image: redis:7.0-alpine
+    container_name: ix-db-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+
+  # 2. Python FastAPI AI Service
+  ai-service:
+    build:
+      context: ./ai-service
+    container_name: ix-ai-service
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+    depends_on:
+      - db-postgres
+
+  # 3. Node.js Express.js REST API Backend
+  backend:
+    build:
+      context: ./backend
+    container_name: ix-backend
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - JWT_SECRET=ix-jwt-super-secret-key-999
+      - AI_SERVICE_URL=http://ai-service:8000
+      - DATABASE_URL=postgresql://insightx_user:insightx_password@db-postgres:5432/insightx_prod
+      - MONGO_URI=mongodb://db-mongo:27017/insightx_telemetry
+      - REDIS_URL=redis://db-redis:6379
+    depends_on:
+      - db-postgres
+      - db-mongo
+      - db-redis
+      - ai-service
+
+  # 4. Vite React Frontend (served with Nginx Reverse Proxy)
+  frontend:
+    build:
+      context: .
+      dockerfile: ./frontend/Dockerfile
+    container_name: ix-frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
+  mongodata:
+  redisdata:

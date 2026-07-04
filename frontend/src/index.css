@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background-color: #030712; /* Slate 950 */
+    color: #f3f4f6;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Outfit', sans-serif;
+  }
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* Background Glow Keyframe Animations */
+@keyframes bg-glow-pulse {
+  0%, 100% { transform: translate(0px, 0px) scale(1); opacity: 0.35; }
+  50% { transform: translate(60px, -40px) scale(1.15); opacity: 0.55; }
+}
+
+.animate-glow-1 {
+  animation: bg-glow-pulse 12s infinite ease-in-out;
+}
+
+.animate-glow-2 {
+  animation: bg-glow-pulse 16s infinite alternate ease-in-out;
+}
+
+/* Fade slide up for tab navigation transitions */
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-up {
+  animation: fadeSlideUp 0.4s ease-out forwards;
+}
+
+/* Heatmap Spot pulse keyframes */
+@keyframes pulse-slow {
+  0%, 100% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.15); opacity: 0.8; }
+}
+
+.heatmap-pulse {
+  animation: pulse-slow 3s infinite ease-in-out;
+}
