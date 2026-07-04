@@ -54,3 +54,26 @@ bash
 
 npm run dev
 Open your browser and navigate to http://localhost:5173.
+
+
+<img width="1920" height="1080" alt="Screenshot (344)" src="https://github.com/user-attachments/assets/ceeb35eb-bde5-4876-9133-a545f784203a" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
